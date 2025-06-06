@@ -3,12 +3,15 @@ import createHttpError from 'http-errors';
 import { parsePaginationParams } from '../utils/parsePaginationParams.js';
 import { parseSortParams } from '../utils/parseSortParams.js';
 
+
 export const getAllContactsController = async (req, res) => {
 
+    const { _id: userId } = req.user;
     const { page, perPage } = parsePaginationParams(req.query);
     const { sortBy, sortOrder } = parseSortParams(req.query);
 
     const contacts = await getAllContacts({
+        userId,
         page,
         perPage,
         sortBy,
@@ -24,10 +27,10 @@ export const getAllContactsController = async (req, res) => {
 };
 
 export const getContactByIdController = async (req, res) => {
-
+    const { _id: userId } = req.user;
     const { contactId } = req.params;
 
-    const contact = await getContactById(contactId);
+    const contact = await getContactById(contactId, userId);
 
     if (!contact) {
         throw createHttpError(404, "Contact not found");
@@ -42,7 +45,10 @@ export const getContactByIdController = async (req, res) => {
     });
 };
 export const createContactController = async (req, res) => {
-    const contactAdded = await createContact (req.body);
+
+    const { _id: userId } = req.user;
+
+    const contactAdded = await createContact({...req.body, userId});
 
     res.status(201).json({
         status: 201,
@@ -52,9 +58,10 @@ export const createContactController = async (req, res) => {
 };
 
 export const updateContactController = async (req, res) => {
+    const { _id: userId } = req.user;
     const { contactId } = req.params;
 
-    const result = await updateContact(contactId, req.body);
+    const result = await updateContact(contactId,req.body, userId);
 
     if (result === null) {
 
@@ -71,8 +78,9 @@ export const updateContactController = async (req, res) => {
 
 export const deleteContactController = async (req, res) => {
     const { contactId } = req.params;
+    const { _id: userId } = req.user;
 
-    const contactDeleded = await deleteContact(contactId);
+    const contactDeleded = await deleteContact(contactId, userId);
 
     if (contactDeleded === null) {
 
