@@ -8,7 +8,7 @@ import { Session} from '../db/models/session.js';
 export const registerUser = async (payload) => {
     const user = await User.findOne({ email: payload.email });
 
-  if (user !== null) {
+  if (user) {
     throw createHttpError(409, 'Email in use');
   }
 
