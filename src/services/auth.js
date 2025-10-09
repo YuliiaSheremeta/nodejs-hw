@@ -1,9 +1,9 @@
-import { User } from '../db/models/user.js';
+import { User } from '../models/user.js';
 import bcrypt from 'bcrypt';
 import crypto from 'node:crypto';
 import createHttpError from 'http-errors';
 import { FIFTEEN_MINUTES, ONE_DAY, SMTP } from '../constants/index.js';
-import { Session } from '../db/models/session.js';
+import { Session } from '../models/session.js';
 import { getEnvVar } from '../utils/getEnvVar.js';
 import { sendEmail } from '../utils/sendEmail.js';
 import jwt from 'jsonwebtoken';
