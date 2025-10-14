@@ -9,10 +9,23 @@ export const getNotes = async ({
         perPage = 10,
         sortOrder = SORT_ORDER.ASC,
         sortBy = '_id',
+        tag,
+        search,
 }) => {
         const limit = perPage;
         const skip = (page - 1) * perPage;
         const filter = { userId };
+
+   if (tag) {
+    filter.tag = tag;
+  }
+
+if (search) {
+    filter.$or = [
+      { title: { $regex: search, $options: 'i' } },
+      { content: { $regex: search, $options: 'i' } },
+    ];
+  }
 
         const notesQuery = Note.find(filter);
 
@@ -23,7 +36,7 @@ export const getNotes = async ({
         const paginationData = calculatePaginationData(notesCount, perPage, page);
 
         return {
-                data: notes,
+               notes,
                 ...paginationData,
         };
 

@@ -4,43 +4,40 @@ import { Session } from '../models/session.js';
 import { User } from '../models/user.js';
 
 export const authenticate = async (req, res, next) => {
-    const authHeader = req.get('Authorization');
-    if (!authHeader) {
-        next(createHttpError(401, 'Please provide Authorization header'));
-        return;
-      }
+    try {
+    // 1. Перевірка наявності accessToken у куках
+    const { accessToken } = req.cookies;
 
-      const bearer = authHeader.split(' ')[0];
-      const token = authHeader.split(' ')[1];
+    if (!accessToken) {
+      return next(createHttpError(401, 'Missing access token'));
+    }
 
-      if (bearer !== 'Bearer' || !token) {
-        next(createHttpError(401, 'Auth header should be of type Bearer'));
-        return;
-      }
+    // 2. Пошук сесії за accessToken
+    const session = await Session.findOne({ accessToken });
 
-      const session = await Session.findOne({ accessToken: token });
+    if (!session) {
+      return next(createHttpError(401, 'Session not found'));
+    }
 
-      if (!session) {
-        next(createHttpError(401, 'Session not found'));
-        return;
-      }
+    // 3. Перевірка, чи не прострочений accessToken
+    const isExpired = new Date() > new Date(session.accessTokenValidUntil);
 
-      const isAccessTokenExpired =
-        new Date() > new Date(session.accessTokenValidUntil);
+    if (isExpired) {
+      return next(createHttpError(401, 'Access token expired'));
+    }
 
-      if (isAccessTokenExpired) {
-        next(createHttpError(401, 'Access token expired'));
-        return;
-      }
+    // 4. Пошук користувача, пов’язаного з сесією
+    const user = await User.findById(session.userId);
 
-      const user = await User.findById(session.userId);
+    if (!user) {
+      return next(createHttpError(401));
+    }
 
-      if (!user) {
-        next(createHttpError(401));
-        return;
-      }
+    // 5. Збереження користувача в req.user
+    req.user = user;
 
-      req.user = user;
-
-      next();
+    next();
+  } catch (error) {
+    next(error);
+  }
 };

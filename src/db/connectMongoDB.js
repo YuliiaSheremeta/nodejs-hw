@@ -5,7 +5,7 @@ export const initMongoConnection = async () => {
    try {
       const user = getEnvVar('MONGODB_USER');
       const pwd = getEnvVar('MONGODB_PASSWORD');
-      const url = getEnvVar('MONGODB_URL');
+      const url = getEnvVar('MONGO_URL');
       const db = getEnvVar('MONGODB_DB');
 
 

@@ -1,9 +1,9 @@
 import { model, Schema } from 'mongoose';
 
-const usersSchema = new Schema(
+const userSchema = new Schema(
     {
-        name:{type: String, required:true},
-        email: { type: String, required: true, unique: true },
+        username:{type: String, trim: true},
+        email: { type: String, required: true,trim: true, unique: true },
         password: { type: String, required: true },
     },
     {
@@ -12,11 +12,18 @@ const usersSchema = new Schema(
     },
 );
 
-usersSchema.methods.toJSON = function () {
+userSchema.pre('save', function (next) {
+  if (!this.username) {
+    this.username = this.email;
+  }
+  next();
+});
+
+userSchema.methods.toJSON = function () {
     const obj = this.toObject();
     delete obj.password;
     return obj;
-  };
+};
 
- const User = model('User', usersSchema);
+ const User = model('User', userSchema);
 export { User };

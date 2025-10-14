@@ -1,24 +1,46 @@
-import Joi from "joi";
+import { Joi,Segments } from "celebrate";
+import { TAGS } from '../constants/tags.js';
+import { isValidObjectId } from "mongoose";
 
-export const createContactSchema = Joi.object({
-    name: Joi.string().min(3).max(20).required().messages({
-        'string.base': 'Username should be a string',
-        'string.min': 'Username should have at least 3 characters',
-        'string.max': 'Username should have at most 20 characters',
-        'any.required': 'Username is required',
-      }),
-    phoneNumber: Joi.string().min(3).max(20).required(),
-    email: Joi.string().email().min(3).max(20),
-    isFavourite: Joi.boolean().default(false),
-    contactType: Joi.string().valid('work', 'home', 'personal').default('personal').required()
 
-});
+const objectIdValidator = (value, helpers) => {
 
-export const updateContactSchema = Joi.object({
-    name: Joi.string().min(3).max(20),
-    phoneNumber: Joi.string().min(3).max(20),
-    email: Joi.string().email().min(3).max(20),
-    isFavourite: Joi.boolean().default(false),
-    contactType: Joi.string().valid('work', 'home', 'personal').default('personal')
+  const isValidId = isValidObjectId(value);
+  return !isValidId ? helpers.message('Invalid id format!') : value;
+};
 
-});
+export const getAllNotesSchema = {
+  [Segments.QUERY]: Joi.object({
+    page: Joi.number().integer().min(1).default(1),
+    perPage: Joi.number().integer().min(5).max(20).default(10),
+    tag: Joi.string().valid(...TAGS),
+    search: Joi.string().allow(''),
+    sortBy: Joi.string(),
+    sortOrder: Joi.string().valid('asc', 'desc'),
+  }),
+};
+
+export const noteIdSchema = {
+   [Segments.PARAMS]: Joi.object({
+    noteId:Joi.string().custom(objectIdValidator).required(),
+  }),
+};
+
+export const createNoteSchema = {
+  [Segments.BODY]: Joi.object({
+    title: Joi.string().min(1).required(),
+    content: Joi.string().allow(''),
+    tag: Joi.string().valid(...TAGS).required(),
+  }),
+};
+
+export const updateNoteSchema = {
+  [Segments.PARAMS]: Joi.object({
+    noteId: Joi.string().custom(objectIdValidator).required(),
+  }),
+  [Segments.BODY]: Joi.object({
+    title: Joi.string().min(1),
+    content: Joi.string().allow(''),
+    tag: Joi.string().valid(...TAGS),
+  }).min(1),
+};

@@ -4,11 +4,13 @@ import { parsePaginationParams } from '../utils/parsePaginationParams.js';
 import { parseSortParams } from '../utils/parseSortParams.js';
 
 
+
 export const getAllNotes  = async (req, res) => {
 
     const { _id: userId } = req.user;
     const { page, perPage } = parsePaginationParams(req.query);
-    const { sortBy, sortOrder } = parseSortParams(req.query);
+  const { sortBy, sortOrder } = parseSortParams(req.query);
+  const { tag, search } = req.query;
 
     const notes = await getNotes({
         userId,
@@ -16,6 +18,8 @@ export const getAllNotes  = async (req, res) => {
         perPage,
         sortBy,
         sortOrder,
+        tag,
+        search,
     });
 
     res.json({
