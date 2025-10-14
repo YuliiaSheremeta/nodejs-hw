@@ -147,7 +147,7 @@ export const sendResetUserToken = async (email) => {
   const template = handlebars.compile(templateSource);
 
   const html = template({
-    name: user.username,
+    userName: user.username,
     link:`${getEnvVar('FRONTEND_DOMAINE')}/reset-password?token=${resetToken}`,
   });
 
@@ -177,7 +177,7 @@ export const resetUserPassword = async (payload) => {
 
   if (!user) {
     throw createHttpError(404, "User not found!");
-    
+
   }
 
   const encryptedPassword = await bcrypt.hash(payload.password, 10);
