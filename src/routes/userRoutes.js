@@ -1,8 +1,8 @@
 import { Router } from "express";
 import { ctrlWrapper } from '../utils/ctrlWrapper.js';
-import { authenticate } from '../middlewares/authenticate.js';
+import { authenticate } from '../middleware/authenticate.js';
 import { updateUserAvatar } from '../controllers/userController.js';
-import { upload } from '../middlewares/multer.js';
+import { upload } from '../middleware/multer.js';
 
 const router = Router();
 

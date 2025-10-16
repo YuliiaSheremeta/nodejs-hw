@@ -6,7 +6,7 @@ import { SMTP } from '../constants/index.js';
 import { FIFTEEN_MINUTES, ONE_DAY } from '../constants/time.js';
 import { Session } from '../models/session.js';
 import { getEnvVar } from '../utils/getEnvVar.js';
-import { sendEmail } from '../utils/sendEmail.js';
+import { sendMail } from '../utils/sendMail.js';
 import jwt from 'jsonwebtoken';
 import handlebars from 'handlebars';
 import path from 'node:path';
@@ -151,7 +151,7 @@ export const sendResetUserToken = async (email) => {
     link:`${getEnvVar('FRONTEND_DOMAINE')}/reset-password?token=${resetToken}`,
   });
 
-  await sendEmail({
+  await sendMail({
     from: getEnvVar(SMTP.SMTP_FROM),
     to: email,
     subject: 'Reset your password',
