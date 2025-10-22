@@ -14,7 +14,7 @@ export const loginUserSchema = {
   }),
 };
 
-export const requestdResetEmailSchema = {
+export const requestResetEmailSchema = {
   [Segments.BODY]:Joi.object({
   email: Joi.string().email().required(),
 }),
